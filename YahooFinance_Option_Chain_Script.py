@@ -1,6 +1,3 @@
-# this project uses Beautiful soup and Yfinance packages to scrape the Yahoo Finance Website and pull the optio chains for a user-inputed ticker symbol. It also saves the file to my personal drive as an excel sheet.
-#It has an additional step where it checks if the options are in-the-money. If options are in the money, then it highlights th entire row in a light green color.
-
 import requests
 import pandas as pd
 import yfinance as yf
@@ -12,10 +9,8 @@ from tkinter import simpledialog
 
 # Function to get ticker symbol using a popup window. user will input the ticker symbol they need to pull. this code will also capitalize in case user inputs in lowercase
 def get_ticker():
-    root = tk.Tk()
-    root.withdraw()  # Hide the root window
-    ticker = simpledialog.askstring(title="Input", prompt="Please enter ticker symbol:")
-    return ticker.upper()
+    ticker = input("Enter Ticker Symbol: ").upper()
+    return ticker
 
 # Function to get the last close price using yfinance package
 def get_last_close_price(ticker):
@@ -43,7 +38,7 @@ tables = soup.find_all('table')
 # Parse each table into a pandas DataFrame
 dataframes = []
 for table in tables:
-    df = pd.read_html(StringIO(str(table)))[0]
+    df = pd.read_html(str(table))[0]
     dataframes.append(df)
 
 # Ensure there are at least two tables, one for calls and one for puts
@@ -63,12 +58,11 @@ puts_df['In the Money'] = puts_df['Strike'].apply(lambda x: 'Yes' if x > close_p
 # Get the current date in MMDDYYYY format
 current_date = datetime.now().strftime('%m%d%Y')
 
-# list the file path where excel file should be saved. name should be in this format- tickerMMDDYYYY
+# List the file path where excel file should be saved. Name should be in this format - tickerMMDDYYYY
 file_name = f'{ticker}{current_date}.xlsx'
-file_path = rf'C:\Users\mende\OneDrive\Documents\Python Projects\Options Chain\{file_name}'
 
 # Save the DataFrames to an Excel file with 2 different tabs/sheets, one for calls and one for puts
-with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
     # Save Calls DataFrame to sheet "Calls"
     calls_df.to_excel(writer, index=False, sheet_name='Calls')
     # Save Puts DataFrame to sheet "Puts"
@@ -96,7 +90,7 @@ with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
         max_len = calls_df[col].astype(str).map(len).max()
         calls_worksheet.set_column(i, i, max_len + 2)  # Adding extra space
 
-    #  conditional format Calls tab. makes row light green if options are in the money
+    # Conditional format Calls tab. makes row light green if options are in the money
     calls_worksheet.conditional_format(1, 0, len(calls_df), len(calls_df.columns) - 1, 
                                        {'type': 'formula',
                                         'criteria': '=$L2="Yes"',
@@ -109,24 +103,11 @@ with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
         max_len = puts_df[col].astype(str).map(len).max()
         puts_worksheet.set_column(i, i, max_len + 2)  # Adding extra space
 
-    # conditional format Puts tab. makes row light green if options are in the money
+    # Conditional format Puts tab. makes row light green if options are in the money
     puts_worksheet.conditional_format(1, 0, len(puts_df), len(puts_df.columns) - 1, 
                                       {'type': 'formula',
                                        'criteria': '=$L2="Yes"',
                                        'format': workbook.add_format({'bg_color': '#C6EFCE'})})
 
 print("Data has been saved to the Excel file successfully.")
-
-
-
-
-
-
-
-
-
-
-
-
-
 
