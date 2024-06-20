@@ -1,5 +1,5 @@
 # this project uses Beautiful soup and Yfinance packages to scrape the Yahoo Finance Website and pull the optio chains for a user-inputed ticker symbol. It also saves the file to my personal drive as an excel sheet.
-It has an additional step where it checks if the options are in-the-money. If options are in the money, then it highlights th entire row in a light green color.
+#It has an additional step where it checks if the options are in-the-money. If options are in the money, then it highlights th entire row in a light green color.
 
 import requests
 import pandas as pd
